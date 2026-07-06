@@ -1,3 +1,4 @@
+import os
 import asyncio
 import logging
 from datetime import datetime
@@ -221,3 +222,19 @@ if __name__ == "__main__":
         asyncio.run(main())
     except KeyboardInterrupt:
         log.info("👋 Бот остановлен")
+
+# Заглушка порта для Render Web Service
+from http.server import HTTPServer, BaseHTTPRequestHandler
+import threading
+
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b'Bot is running!')
+
+def run_web():
+    server = HTTPServer(('0.0.0.0', int(os.environ.get('PORT', 10000))), Handler)
+    server.serve_forever()
+
+threading.Thread(target=run_web, daemon=True).start()
